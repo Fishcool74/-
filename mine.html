@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-hant">
+<head>
+    <meta charset ="UTF-8">
+    <title>踩地雷的啦！</title>
+    <style>
+        #map{
+            display:grid;
+            grid-template-columns:repeat(9,70px);
+            gap:2px;
+        }
+        #map button{
+            background-color:rgb(150,200,50);
+            width:70px;
+            height:70px;
+            font-size:15px;
+            color:black;
+        }
+        #map button:disabled{
+            background-color: rgb(150,150,100);
+        }
+        #top{
+            font-size: 50px;
+            display: flex;
+            gap: 10px;
+        }
+        #flag{
+            width:200px;
+            height:100px;
+            font-size:35px;
+        }
+        #re{
+            width:200px;
+            height:100px;
+            font-size:35px;
+        }
+        #bt{
+            display: flex;
+            gap: 10px;
+        }
+        .gameover{
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div id = "top">
+        <p>踩地雷的啦！</p>
+        <p id = "wl">還沒結束歐</p>
+    </div>
+    <div id="map"></div>
+    <div id="bt">
+        <button id = "flag">我要插旗子</button>
+        <button id = "re" style="display: none;">再來一局</button>
+    </div>
+    <script>
+        let de = 0;
+        let flg = false;
+        let go = false;
+
+        const mine = [];
+        const map = document.getElementById("map");
+        const wl = document.getElementById("wl");
+        const flag = document.getElementById("flag");
+        const again = document.getElementById("re");
+
+        while(mine.length < 10){
+            const po = Math.floor(Math.random()*81);
+            if(!mine.includes(po)){
+                mine.push(po);
+            }
+        }
+
+        function detect(i){
+            const lie = Math.floor(i/9);
+            const han = i%9;
+            let count = 0;
+            for(let vl=-1 ; vl<2 ; vl++){
+                for(let vh=-1 ; vh<2 ; vh++){
+                    if(vl===0 && vh===0){
+                        continue;
+                    }
+
+                    const l = lie+vl;
+                    const h = han+vh;
+
+                    if(l>=9 || l<0 || h>=9 || h<0){
+                        continue;
+                    }
+
+                    if(mine.includes(l*9+h)){
+                        count++;
+                    }
+                }
+            }
+            return count;
+        }
+
+        function showzero(i){
+            const op = map.querySelectorAll("button");
+            const lie = Math.floor(i/9);
+            const han = i%9;
+            for(let vl=-1 ; vl<2 ; vl++){
+                for(let vh=-1 ; vh<2 ; vh++){
+                    if(vl===0 && vh===0){
+                        continue;
+                    }
+
+                    const l = lie+vl;
+                    const h = han+vh;
+
+                    if(l>=9 || l<0 || h>=9 || h<0){
+                        continue;
+                    }
+
+                    const next = l*9 + h;
+
+                    if(op[next].disabled || mine.includes(next)){
+                        continue;
+                    }
+
+                    const count = detect(next);
+                    if(count === 0){
+                        op[next].textContent=count;
+                        op[next].disabled=true;
+                        showzero(next);
+                    }
+                    else{
+                        op[next].textContent = count;
+                        op[next].disabled = true;
+                    }
+                }
+            }
+        }
+
+        async function showboom(){
+            const but = map.querySelectorAll("button");
+            for(let i=0 ; i<mine.length ; i++){
+                but[mine[i]].textContent="💣";
+                but[mine[i]].disabled=true;
+                await wait(250);
+            }
+        }
+
+        function wait(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        flag.addEventListener("click",function(){
+            if(flg === false){
+                flg=!flg;
+                flag.textContent="我要挖地雷";
+            }
+            else{
+                flg=!flg;
+                flag.textContent="我要插旗子";
+            }
+        })
+
+        for(let i=0 ; i<81 ; i++){
+            const bt = document.createElement("button");
+            bt.textContent="X";
+            bt.addEventListener("click",function(){
+                if(flg){
+                    if(bt.classList.contains("al")){
+                        bt.textContent="X";
+                        bt.classList.remove(al);
+                    }
+                    else{
+                        bt.textContent="🚩";
+                        bt.classList.add("al");
+                    }
+                }
+                else{
+                    if(mine.includes(i) && !bt.classList.contains("al")){
+                        bt.textContent="💣";
+                        bt.disabled=true;
+                        wl.textContent="你被炸彈的爆炸炸爆了";
+                        map.classList.add("gameover");
+                        again.style.display = "block";
+                        again.addEventListener("click", function(){location.reload()});
+                        showboom();
+                    }
+                    else{
+                        if(!bt.classList.contains("al")){
+                            const count = detect(i);
+                            if(count === 0){
+                                bt.textContent=count;
+                                bt.disabled=true;
+                                showzero(i)
+                            }
+                            else{
+                                bt.textContent=count;
+                                bt.disabled=true;
+                                if(de === 71){
+                                    wl.textContent = "全部找到了!!";
+                                    again.style.display = "block";
+                                    again.addEventListener("click", function(){location.reload()});
+                                }
+                            }
+                            de++;
+                        }
+                    }
+                }
+            });
+            map.appendChild(bt);
+        }
+    </script>
+</body>
+</html>
