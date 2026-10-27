@@ -191,6 +191,7 @@
                             if(count === 0){
                                 bt.textContent=count;
                                 bt.disabled=true;
+                                de++;
                                 showzero(i)
                             }
                             else{
@@ -209,7 +210,7 @@
             });
             map.appendChild(bt);
         }
-        damn.addEventListerner("click",function(){alert(de)});
+        damn.addEventListener("click",function(){alert(de)});
     </script>
 </body>
 </html>
