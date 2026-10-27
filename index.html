@@ -53,6 +53,7 @@
         <button id = "flag">我要插旗子</button>
         <button id = "re" style="display: none;">再來一局</button>
     </div>
+    <button id = "damn">測</button>
     <script>
         let de = 0;
         let flg = false;
@@ -63,6 +64,7 @@
         const wl = document.getElementById("wl");
         const flag = document.getElementById("flag");
         const again = document.getElementById("re");
+        const damn = document.getElementById("damn");
 
         while(mine.length < 10){
             const po = Math.floor(Math.random()*81);
@@ -207,6 +209,7 @@
             });
             map.appendChild(bt);
         }
+        damn.addEventListerner("click",function(){alert(de)});
     </script>
 </body>
 </html>
