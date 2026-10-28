@@ -41,42 +41,137 @@
         .gameover{
             pointer-events: none;
         }
+        #dif{
+            display: flex;
+            gap: 10px;
+        }
+        #ez{
+            width:100px;
+            height:50px;
+            font-size:17px;
+        }
+        #mid{
+            width:100px;
+            height:50px;
+            font-size:17px;
+        }
+        #hard{
+            width:100px;
+            height:50px;
+            font-size:17px;
+        }
     </style>
 </head>
 <body>
     <div id = "top">
         <p>踩地雷的啦！</p>
-        <p id = "wl">還沒結束歐</p>
+        <p id = "wl">選個難度吧!</p>
     </div>
+    <div id="dif">
+        <button id="ez">初級</button>
+        <button id="mid">中級</button>
+        <button id="hard">高級</button>
+    </div>
+
     <div id="map"></div>
+
     <div id="bt">
         <button id = "flag">我要插旗子</button>
         <button id = "re" style="display: none;">再來一局</button>
     </div>
-    <button id = "damn">測</button>
     <script>
         let de = 0;
         let flg = false;
         let go = false;
+        let start = false;
+        let mineka = 0;
+        let mapbig = 0;
+        let mapwidth = 0;
+        let mapheight = 0;
+        let goal = 0;
 
         const mine = [];
         const map = document.getElementById("map");
         const wl = document.getElementById("wl");
         const flag = document.getElementById("flag");
         const again = document.getElementById("re");
-        const damn = document.getElementById("damn");
+        const ez = document.getElementById("ez");
+        const mid = document.getElementById("mid");
+        const hard = document.getElementById("hard");
+        
+        map.style.display = "none";
+        flag.style.display = "none";
 
-        while(mine.length < 10){
-            const po = Math.floor(Math.random()*81);
-            if(!mine.includes(po)){
-                mine.push(po);
+        ez.addEventListener("click",function(){
+            map.innerHTML = "";
+            mineka = 10;
+            mapbig = 81;
+            mapwidth = 9;
+            mapheight = 9;
+            goal = mapbig-mineka;
+            start = true;
+            map.style.gridTemplateColumns = `repeat(${mapwidth}, 70px)`;
+            wl.textContent = "找出地雷吧!";
+            map.style.display = "grid";   
+            flag.style.display = "block"; 
+            while(mine.length < mineka){
+                const po = Math.floor(Math.random()*mapbig);
+                if(!mine.includes(po)){
+                    mine.push(po);
+                }
             }
-        }
+            createmap();          
+        });
+
+        mid.addEventListener("click",function(){
+            map.innerHTML = "";
+            mineka = 40;
+            mapbig = 256;
+            mapwidth = 16;
+            mapheight = 16;
+            goal = mapbig-mineka;
+            start = true;
+            map.style.gridTemplateColumns = `repeat(${mapwidth}, 70px)`;
+            wl.textContent = "找出地雷吧!";
+            map.style.display = "grid";   
+            flag.style.display = "block";  
+            while(mine.length < mineka){
+                const po = Math.floor(Math.random()*mapbig);
+                if(!mine.includes(po)){
+                    mine.push(po);
+                }
+            }    
+            createmap();      
+        });
+        
+        hard.addEventListener("click",function(){
+            map.innerHTML = "";
+            mineka = 99;
+            mapbig = 480;
+            mapwidth = 16;
+            mapheight = 30;
+            goal = mapbig-mineka;
+            start = true;
+            map.style.gridTemplateColumns = `repeat(${mapwidth}, 70px)`;
+            wl.textContent = "找出地雷吧!";
+            map.style.display = "grid";   
+            flag.style.display = "block";  
+            while(mine.length < mineka){
+                const po = Math.floor(Math.random()*mapbig);
+                if(!mine.includes(po)){
+                    mine.push(po);
+                }
+            }  
+            createmap();        
+        });
+       
+        
 
         function detect(i){
-            const lie = Math.floor(i/9);
-            const han = i%9;
+            const lie = Math.floor(i/mapwidth);
+            const han = i%mapwidth;
             let count = 0;
+
             for(let vl=-1 ; vl<2 ; vl++){
                 for(let vh=-1 ; vh<2 ; vh++){
                     if(vl===0 && vh===0){
@@ -86,11 +181,11 @@
                     const l = lie+vl;
                     const h = han+vh;
 
-                    if(l>=9 || l<0 || h>=9 || h<0){
+                    if(l>=mapheight || l<0 || h>=mapwidth || h<0){
                         continue;
                     }
 
-                    if(mine.includes(l*9+h)){
+                    if(mine.includes(l*mapwidth+h)){
                         count++;
                     }
                 }
@@ -100,8 +195,8 @@
 
         function showzero(i){
             const op = map.querySelectorAll("button");
-            const lie = Math.floor(i/9);
-            const han = i%9;
+            const lie = Math.floor(i/mapwidth);
+            const han = i%mapwidth;
             for(let vl=-1 ; vl<2 ; vl++){
                 for(let vh=-1 ; vh<2 ; vh++){
                     if(vl===0 && vh===0){
@@ -111,27 +206,33 @@
                     const l = lie+vl;
                     const h = han+vh;
 
-                    if(l>=9 || l<0 || h>=9 || h<0){
+                    if(l>=mapheight || l<0 || h>=mapwidth || h<0){
                         continue;
                     }
 
-                    const next = l*9 + h;
+                    const next = l*mapwidth + h;
 
                     if(op[next].disabled || mine.includes(next)){
                         continue;
                     }
 
                     const count = detect(next);
+
                     if(count === 0){
-                        op[next].textContent=count;
+                        op[next].textContent="";
                         op[next].disabled=true;
-                        showzero(next);
                         de++;
+                        showzero(next);
                     }
                     else{
                         op[next].textContent = count;
                         op[next].disabled = true;
                         de++;
+                        if(de === goal){
+                            wl.textContent = "全部找到了!!";
+                            again.style.display = "block";
+                            again.addEventListener("click", function(){location.reload()});
+                        }
                     }
                 }
             }
@@ -159,58 +260,59 @@
                 flg=!flg;
                 flag.textContent="我要插旗子";
             }
-        })
+        });
 
-        for(let i=0 ; i<81 ; i++){
-            const bt = document.createElement("button");
-            bt.textContent="X";
-            bt.addEventListener("click",function(){
-                if(flg){
-                    if(bt.classList.contains("al")){
-                        bt.textContent="X";
-                        bt.classList.remove(al);
+        function createmap(){
+            for(let i=0 ; i<mapbig ; i++){
+                const bt = document.createElement("button");
+                bt.textContent="X";
+                bt.addEventListener("click",function(){
+                    if(flg){
+                        if(bt.classList.contains("al")){
+                            bt.textContent="X";
+                            bt.classList.remove("al");
+                        }
+                        else{
+                            bt.textContent="🚩";
+                            bt.classList.add("al");
+                        }
                     }
                     else{
-                        bt.textContent="🚩";
-                        bt.classList.add("al");
-                    }
-                }
-                else{
-                    if(mine.includes(i) && !bt.classList.contains("al")){
-                        bt.textContent="💣";
-                        bt.disabled=true;
-                        wl.textContent="你被炸彈的爆炸炸爆了";
-                        map.classList.add("gameover");
-                        again.style.display = "block";
-                        again.addEventListener("click", function(){location.reload()});
-                        showboom();
-                    }
-                    else{
-                        if(!bt.classList.contains("al")){
-                            const count = detect(i);
-                            if(count === 0){
-                                bt.textContent=count;
-                                bt.disabled=true;
-                                de++;
-                                showzero(i)
-                            }
-                            else{
-                                bt.textContent=count;
-                                bt.disabled=true;
-                                de++;
-                                if(de === 71){
-                                    wl.textContent = "全部找到了!!";
-                                    again.style.display = "block";
-                                    again.addEventListener("click", function(){location.reload()});
+                        if(mine.includes(i) && !bt.classList.contains("al")){
+                            bt.textContent="💣";
+                            bt.disabled=true;
+                            wl.textContent="你被炸彈的爆炸炸爆了";
+                            map.classList.add("gameover");
+                            again.style.display = "block";
+                            again.addEventListener("click", function(){location.reload()});
+                            showboom();
+                        }    
+                        else{
+                            if(!bt.classList.contains("al")){
+                                const count = detect(i);
+                                if(count === 0){
+                                    bt.textContent="";
+                                    bt.disabled=true;
+                                    de++;
+                                    showzero(i)
+                                }
+                                else{
+                                    bt.textContent=count;
+                                    bt.disabled=true;
+                                    de++;
+                                    if(de === goal){
+                                        wl.textContent = "全部找到了!!";
+                                        again.style.display = "block";
+                                        again.addEventListener("click", function(){location.reload()});
+                                    }
                                 }
                             }
                         }
                     }
-                }
-            });
+                });
             map.appendChild(bt);
+            }
         }
-        damn.addEventListener("click",function(){alert(de)});
     </script>
 </body>
 </html>
