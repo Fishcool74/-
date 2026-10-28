@@ -98,11 +98,13 @@
         const ez = document.getElementById("ez");
         const mid = document.getElementById("mid");
         const hard = document.getElementById("hard");
+        const dif = document.getElementById("dif");
         
         map.style.display = "none";
         flag.style.display = "none";
 
         ez.addEventListener("click",function(){
+            dif.style.display = "none";
             map.innerHTML = "";
             mineka = 10;
             mapbig = 81;
@@ -124,6 +126,7 @@
         });
 
         mid.addEventListener("click",function(){
+            dif.style.display = "none";
             map.innerHTML = "";
             mineka = 40;
             mapbig = 256;
@@ -145,6 +148,7 @@
         });
         
         hard.addEventListener("click",function(){
+            dif.style.display = "none";
             map.innerHTML = "";
             mineka = 99;
             mapbig = 480;
