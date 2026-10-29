@@ -63,6 +63,9 @@
         #jigan{
             font-size: 50px;
         }
+        #kazo{
+            font-size: 40px;
+        }
     </style>
 </head>
 <body>
@@ -71,6 +74,7 @@
         <p id = "wl">選個難度吧!</p>
     </div>
     <p id="jigan"><span id="min">00</span>:<span id="sec">00</span></p>
+    <p id="kazo">總共有<span id="jilai">0</span>顆地雷,你插了<span id="chizi">0</span>根旗子</p>
     <div id="dif">
         <button id="ez">初級</button>
         <button id="mid">中級</button>
@@ -96,6 +100,7 @@
         let timer = null;
         let s = 0;
         let m = 0;
+        let chizi = 0;
 
         const mine = [];
         const map = document.getElementById("map");
@@ -109,10 +114,16 @@
         const sec = document.getElementById("sec");
         const min = document.getElementById("min");
         const jigan = document.getElementById("jigan");
+        const kazo = document.getElementById("kazo");
+        const chizimon = document.getElementById("chizi");
+        const jilaimon = document.getElementById("jilai");
         
         map.style.display = "none";
         flag.style.display = "none";
         jigan.style.display = "none";
+        kazo.style.display = "none";
+
+        chizimon.textContent = chizi;
 
         ez.addEventListener("click",function(){
             dif.style.display = "none";
@@ -123,11 +134,13 @@
             mapheight = 9;
             goal = mapbig-mineka;
             start = true;
+            jilaimon.textContent = mineka;
             map.style.gridTemplateColumns = `repeat(${mapwidth}, 70px)`;
             wl.textContent = "找出地雷吧!";
             map.style.display = "grid";   
             flag.style.display = "block"; 
             jigan.style.display = "block";
+            kazo.style.display = "block";
             while(mine.length < mineka){
                 const po = Math.floor(Math.random()*mapbig);
                 if(!mine.includes(po)){
@@ -146,11 +159,13 @@
             mapheight = 16;
             goal = mapbig-mineka;
             start = true;
+            jilaimon.textContent = mineka;
             map.style.gridTemplateColumns = `repeat(${mapwidth}, 70px)`;
             wl.textContent = "找出地雷吧!";
             map.style.display = "grid";   
             flag.style.display = "block";  
             jigan.style.display = "block";
+            kazo.style.display = "block";
             while(mine.length < mineka){
                 const po = Math.floor(Math.random()*mapbig);
                 if(!mine.includes(po)){
@@ -169,11 +184,13 @@
             mapheight = 30;
             goal = mapbig-mineka;
             start = true;
+            jilaimon.textContent = mineka;
             map.style.gridTemplateColumns = `repeat(${mapwidth}, 70px)`;
             wl.textContent = "找出地雷吧!";
             map.style.display = "grid";   
             flag.style.display = "block";  
             jigan.style.display = "block";
+            kazo.style.display = "block";
             while(mine.length < mineka){
                 const po = Math.floor(Math.random()*mapbig);
                 if(!mine.includes(po)){
@@ -280,6 +297,8 @@
                         de++;
                         if(de === goal){
                             stoptimer();
+                            kazo.style.display = "none";
+                            flag.style.display = "none";
                             wl.textContent = "全部找到了!!";
                             again.style.display = "block";
                             jigan.textContent = "你花了" + m + "分" + s + "秒就找完地雷了 真棒";
@@ -323,15 +342,21 @@
                         if(bt.classList.contains("al")){
                             bt.textContent="X";
                             bt.classList.remove("al");
+                            chizi--;
+                            chizimon.textContent = chizi;
                         }
                         else{
                             bt.textContent="🚩";
                             bt.classList.add("al");
+                            chizi++;
+                            chizimon.textContent = chizi;
                         }
                     }
                     else{
                         if(mine.includes(i) && !bt.classList.contains("al")){
                             stoptimer();
+                            kazo.style.display = "none";
+                            flag.style.display = "none";
                             jigan.textContent = "你花了" + m + "分" + s + "秒就被炸爆了 真棒";
                             bt.textContent="💣";
                             bt.disabled=true;
@@ -357,6 +382,8 @@
                                     de++;
                                     if(de === goal){
                                         stoptimer();
+                                        kazo.style.display = "none";
+                                        flag.style.display = "none";
                                         wl.textContent = "全部找到了!!";
                                         again.style.display = "block";
                                         jigan.textContent = "你花了" + m + "分" + s + "秒就找完地雷了 真棒";
