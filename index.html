@@ -60,6 +60,9 @@
             height:50px;
             font-size:17px;
         }
+        #jigan{
+            font-size: 50px;
+        }
     </style>
 </head>
 <body>
@@ -67,6 +70,7 @@
         <p>踩地雷的啦！</p>
         <p id = "wl">選個難度吧!</p>
     </div>
+    <p id="jigan"><span id="min">00</span>:<span id="sec">00</span></p>
     <div id="dif">
         <button id="ez">初級</button>
         <button id="mid">中級</button>
@@ -89,6 +93,9 @@
         let mapwidth = 0;
         let mapheight = 0;
         let goal = 0;
+        let timer = null;
+        let s = 0;
+        let m = 0;
 
         const mine = [];
         const map = document.getElementById("map");
@@ -99,9 +106,13 @@
         const mid = document.getElementById("mid");
         const hard = document.getElementById("hard");
         const dif = document.getElementById("dif");
+        const sec = document.getElementById("sec");
+        const min = document.getElementById("min");
+        const jigan = document.getElementById("jigan");
         
         map.style.display = "none";
         flag.style.display = "none";
+        jigan.style.display = "none";
 
         ez.addEventListener("click",function(){
             dif.style.display = "none";
@@ -116,6 +127,7 @@
             wl.textContent = "找出地雷吧!";
             map.style.display = "grid";   
             flag.style.display = "block"; 
+            jigan.style.display = "block";
             while(mine.length < mineka){
                 const po = Math.floor(Math.random()*mapbig);
                 if(!mine.includes(po)){
@@ -138,6 +150,7 @@
             wl.textContent = "找出地雷吧!";
             map.style.display = "grid";   
             flag.style.display = "block";  
+            jigan.style.display = "block";
             while(mine.length < mineka){
                 const po = Math.floor(Math.random()*mapbig);
                 if(!mine.includes(po)){
@@ -160,6 +173,7 @@
             wl.textContent = "找出地雷吧!";
             map.style.display = "grid";   
             flag.style.display = "block";  
+            jigan.style.display = "block";
             while(mine.length < mineka){
                 const po = Math.floor(Math.random()*mapbig);
                 if(!mine.includes(po)){
@@ -170,6 +184,38 @@
         });
        
         
+        function starttimer(){
+            if(timer !== null){
+                return;
+            }
+            
+            timer = setInterval(function(){
+                if(s>58){
+                    s = 0;
+                    m++;
+                }
+                else{
+                    s++;
+                }
+                if(s<10){
+                    sec.textContent = "0" + s;
+                }
+                else{
+                    sec.textContent = s;
+                }
+                if(m<10){
+                    min.textContent = "0" + m;
+                }
+                else{
+                    min.textContent = m;
+                }
+            },1000);
+        }
+
+        function stoptimer(){
+            clearInterval(timer);
+            timer = null;
+        }
 
         function detect(i){
             const lie = Math.floor(i/mapwidth);
@@ -233,8 +279,10 @@
                         op[next].disabled = true;
                         de++;
                         if(de === goal){
+                            stoptimer();
                             wl.textContent = "全部找到了!!";
                             again.style.display = "block";
+                            jigan.textContent = "你花了" + m + "分" + s + "秒就找完地雷了 真棒";
                             again.addEventListener("click", function(){location.reload()});
                         }
                     }
@@ -283,6 +331,8 @@
                     }
                     else{
                         if(mine.includes(i) && !bt.classList.contains("al")){
+                            stoptimer();
+                            jigan.textContent = "你花了" + m + "分" + s + "秒就被炸爆了 真棒";
                             bt.textContent="💣";
                             bt.disabled=true;
                             wl.textContent="你被炸彈的爆炸炸爆了";
@@ -293,6 +343,7 @@
                         }    
                         else{
                             if(!bt.classList.contains("al")){
+                                starttimer();
                                 const count = detect(i);
                                 if(count === 0){
                                     bt.textContent="";
@@ -305,8 +356,10 @@
                                     bt.disabled=true;
                                     de++;
                                     if(de === goal){
+                                        stoptimer();
                                         wl.textContent = "全部找到了!!";
                                         again.style.display = "block";
+                                        jigan.textContent = "你花了" + m + "分" + s + "秒就找完地雷了 真棒";
                                         again.addEventListener("click", function(){location.reload()});
                                     }
                                 }
